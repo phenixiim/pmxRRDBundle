@@ -40,8 +40,10 @@ class PmxRrdGraph
     public $graphHeight = 100;
 
     public $onlyGraph = false;
+    public $aliases ='';
+    public $dbPath;
+    public $imagePath = 'web/';
 
-    public $aliases;
 
     public function setTitle($text) {
         $this->title = $text;

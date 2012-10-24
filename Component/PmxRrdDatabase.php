@@ -27,6 +27,7 @@ class PmxRrdDatabase extends ContainerAware
     public $dsa = array();
     public $rraa = array();
 
+    public $path;
     public $dbname= 'test.rrd';
     /** @var int step in seconds */
     public $step = 300;
@@ -41,10 +42,10 @@ class PmxRrdDatabase extends ContainerAware
      */
     public $start = 'now';
 
-//    function __construct($diContainer)
-//    {
-//        $this->setContainer($diContainer);
-//    }
+    function __construct($path)
+    {
+        $this->path = $path;
+    }
 
 
     /**
@@ -53,7 +54,7 @@ class PmxRrdDatabase extends ContainerAware
      */
     public function setDbName($dbname)
     {
-        $this->dbname = $dbname;
+        $this->dbname = $this->path.$dbname;
         return $this;
     }
 
