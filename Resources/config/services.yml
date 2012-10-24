@@ -1,0 +1,13 @@
+parameters:
+#    pmx_rrd.example.class: Pmx\Bundle\RrdBundle\Example
+
+services:
+#    pmx_rrd.example:
+#        class: %pmx_rrd.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
+    pmx_rrd.graph:
+        class: Pmx\Bundle\RrdBundle\Component\PmxRrdGraph
+#        arguments: [@service_id]
+    pmx_rrd.db:
+        class: Pmx\Bundle\RrdBundle\Component\PmxRrdDatabase
+#        arguments: [@service_id]
