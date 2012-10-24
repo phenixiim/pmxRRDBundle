@@ -42,8 +42,13 @@ class PmxRrdGraph
     public $onlyGraph = false;
     public $aliases ='';
     public $dbPath;
-    public $imagePath = 'web/';
+    public $imagePath;
 
+    function __construct($dbLocation, $imageLocation)
+    {
+        $this->dbPath = $dbLocation;
+        $this->imagePath = $imageLocation;
+    }
 
     public function setTitle($text) {
         $this->title = $text;

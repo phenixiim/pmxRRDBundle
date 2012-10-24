@@ -1,11 +1,8 @@
 parameters:
     pmx_rrd.rra_file_location: '/var/tmp/'
-    pmx_rrd.png_file_location: '/var/tmp/'
+    pmx_rrd.png_file_location: '/pmxrrd/images/'
 
 services:
-#    pmx_rrd.example:
-#        class: %pmx_rrd.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
     pmx_rrd.graph:
         class: Pmx\Bundle\RrdBundle\Component\PmxRrdGraph
         arguments: [%pmx_rrd.rra_file_location%]
