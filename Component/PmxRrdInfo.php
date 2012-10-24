@@ -10,11 +10,20 @@ class PmxRrdInfo
     public $filename;
     public $data;
 
+    /**
+     * @param string $filename Rrd database filename
+     */
     public function __construct($filename)
     {
         $this->filename = $filename;
+        $this->transform();
     }
 
+    /**
+     * transform info from rrd_info into nice array.
+     *
+     * @return PmxRrdInfo
+     */
     function transform()
     {
         $this->data = array();
@@ -27,11 +36,20 @@ class PmxRrdInfo
         return $this;
     }
 
+    /**
+     * Get info array about
+     * @return mixed
+     */
     public function getInfo()
     {
         return $this->data;
     }
 
+    /**
+     * Get names of DataSources in RRD file
+     *
+     * @return array
+     */
     public function getDSNames()
     {
         return array_keys($this->data['ds']);

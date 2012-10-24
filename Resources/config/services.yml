@@ -1,5 +1,5 @@
 parameters:
-#    pmx_rrd.example.class: Pmx\Bundle\RrdBundle\Example
+    pmx_rrd.file_location: '/var/tmp'
 
 services:
 #    pmx_rrd.example:
