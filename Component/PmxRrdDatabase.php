@@ -64,23 +64,24 @@ class PmxRrdDatabase extends ContainerAware
      */
     public function tune($dbFileName, array $options)
     {
-
-        $options=array(
-//            "--heartbeat $ds:$heartbeat",
-//            "--minimum "
-        );
-
-
+        //todo: simple setters for most features.
         rrd_tune($dbFileName, $options);
     }
 
+    /**
+     * Write down  file
+     *
+     * @param bool $overwriteFile
+     * @return PmxRrdDatabase
+     * @throws \JMS\AopBundle\Exception\RuntimeException
+     * @throws \Exception
+     */
     public function create($overwriteFile = false) {
 
         if(file_exists($this->dbname) && $overwriteFile == false) {
             return $this;//TODO: figure out how to test it.
             throw new RuntimeException('Database with filename = '.$this->dbname . ' already exist.');
         }
-
 
         if(count($this->dsa) <1 ) {
             throw new RuntimeException('Database must have at least one DataSource ');
@@ -90,7 +91,6 @@ class PmxRrdDatabase extends ContainerAware
         if(count($this->rraa) <1 ) {
             throw new RuntimeException('Database must have at least one RRA');
         }
-
 
         $opts = array(
             "--step", $this->step,
@@ -106,8 +106,6 @@ class PmxRrdDatabase extends ContainerAware
         foreach (  $this->rraa as $rra ) {
             $opts[] = $rra;
         }
-
-
 
         //try to create db file
         $ret = rrd_create($this->dbname, $opts);
@@ -134,9 +132,14 @@ class PmxRrdDatabase extends ContainerAware
         }
         $dataToUpdate[$this->dbname][$time] = array($dataSource => $value);
 
-        return $this;
+       return $this;
     }
 
+    /**
+     * Actually update database
+     *
+     * @return PmxRrdDatabase
+     */
     public function doUpdate()
     {
         $updater = new RRDUpdater($this->dbname);
