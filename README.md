@@ -81,3 +81,7 @@ _любой символ, кроме '%', печатается как есть_
 * %Z - часовой пояс
 
 
+#TODO
+* write down more unit tests
+* write some docs (on usage/ and on rrd it self)
+* Examples of using it for all stebs. based on some simple data(like kb/s network trafic)
