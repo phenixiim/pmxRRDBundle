@@ -9,7 +9,7 @@ RRD bundle for symfony2
 
 Draw a graph
 ------------
-
+```php
 $pmxRrd = $this->get('pmx_rrd.graph');
 
 $pmxRrd->setTitle('Chart Title')
@@ -21,3 +21,4 @@ $pmxRrd->setTitle('Chart Title')
     ->addCDef('goldAvg', 'goldcount,1,*')
     ->line('goldAvg', 'Gold amount on this week\\r')
     ->doDraw();
+```
