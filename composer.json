@@ -1,9 +1,9 @@
 {
     "name": "pmx/rrd-bundle",
-    "description": "Parser bundle",
+    "description": "Bundle for simple rrd work.",
     "minimum-stability": "dev",
     "autoload": {
-        "psr-0": { "Noop\\ParserBundle": "" }
+        "psr-0": { "Pmx\\Bundle\\RrdBundle": "" }
     },
-    "target-dir": "Noop/ParserBundle"
+    "target-dir": "Pmx/Bundle/RrdBundle"
 }
