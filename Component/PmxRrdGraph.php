@@ -7,6 +7,7 @@
 namespace Pmx\Bundle\RrdBundle\Component;
 
 use RuntimeException;
+use PmxRrdInfo;
 
 class PmxRrdGraph
 {
@@ -16,9 +17,8 @@ class PmxRrdGraph
     function getDataSourceFromDb($filename)
     {
 
-        $database = $this->rrdinfo($filename);
-        return $database['ds'];
-        return array_keys($this->rrdinfo($filename));
+        $rrdInfo = new PmxRrdInfo($filename);
+        return $rrdInfo->getDSNames();
     }
 
     public $title = 'pmx graph example';
@@ -125,6 +125,7 @@ class PmxRrdGraph
      */
     public function area($varName, $legend, $hexColor=380470, $stack = false)
     {
+        if($stack){ $stack = ':STACK'; } else { $stack = ''; }
         $this->displayDataRules[] = "AREA:$varName#$hexColor:$legend".$stack;
         return $this;
     }
@@ -164,8 +165,6 @@ class PmxRrdGraph
         if(!file_exists($fileName)) {
             throw new RuntimeException('FUck Ya! try to use existed db');
         }
-
-
 
         if(!empty($start)) {
             $start = ":start=$start";
@@ -239,6 +238,11 @@ class PmxRrdGraph
         var_dump($this->getOptions());
         $outputFileName = "x.png";
 
+        $x = pathinfo($this->filename);
+
+
+        $outputFileName = $this->imagePath.$x['filename'].'.png';
+
         try{
             $ret = rrd_graph($outputFileName, $this->getOptions());
 
@@ -249,64 +253,12 @@ class PmxRrdGraph
 
                 echo "rrd_graph() ERROR: $err\n";
             }
-            else {
-//        echo "\nServer [$serverName] Status OK ";
-            }
 
         } catch( Exception $e) {
             echo "hujeta";
         }
 
 
-    }
-
-    function rrdinfo($filename) {
-
-        /*
-           Inner functions to make them inaccesible from the outside of the main function
-        */
-        function add($key, $value, &$main_table) {
-            if (is_array($value)) {
-                foreach ($value as $k => $v) {
-                    add($k, $v, $main_table[$key]);
-                }
-            } else {
-                $main_table[$key] = $value;
-            }
-        }
-
-        function toobj($key, $value) {
-            $matches = array();
-            if (preg_match('/^\\[(.*)\\]$/', $key, $matches)) {
-                $key = $matches[1];
-            }
-            if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $key, $matches)) {
-                $matches2 = array();
-                if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $matches[3], $matches2)) {
-                    $ret_key = $matches[1];
-                    list($k, $v) = toobj($matches[3], $value);
-                    $ret_val = array($matches[2] => array($k => $v));
-                } else {
-                    $ret_key = $matches[1];
-                    $ret_val = array($matches[2] => array ($matches[3] => $value));
-                }
-            } else {
-                $ret_key = $key;
-                $ret_val = $value;
-            }
-            return array($ret_key, $ret_val);
-        }
-
-        /*
-           Main program code
-        */
-        $main_table = array();
-        $info = rrd_info($filename);
-        foreach ($info as $ds_key => $ds_value) {
-            list ($key, $value) = toobj($ds_key, $ds_value);
-            add($key, $value, $main_table);
-        }
-        return $main_table;
     }
 }
 
