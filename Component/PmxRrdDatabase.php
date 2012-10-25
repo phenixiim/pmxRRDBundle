@@ -65,6 +65,7 @@ class PmxRrdDatabase
     {
         //todo: simple setters for most features.
         rrd_tune($dbFileName, $options);
+
         return $this;
     }
 
@@ -177,6 +178,7 @@ class PmxRrdDatabase
         DS:имя_источника:тип_источника:интервал_определенности:min:max \
          */
         $this->dsa[] = "DS:$name:$type:$heartbeat:$min:$max";
+
         return $this;
     }
 
@@ -202,6 +204,7 @@ class PmxRrdDatabase
          *  RRA:функция-консолидации:x-доля:отсчетов-на-ячейку:число-ячеек
          */
         $this->rraa[] = "RRA:$type:$reliability:$reportsOnCell:$cellCount";
+
         return $this;
     }
 }
