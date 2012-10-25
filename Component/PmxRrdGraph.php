@@ -14,18 +14,19 @@ class PmxRrdGraph
 
     public $filename;
 
-    function getDataSourceFromDb($filename)
+    protected function getDataSourceFromDb($filename)
     {
 
         $rrdInfo = new PmxRrdInfo($filename);
+
         return $rrdInfo->getDSNames();
     }
 
     public $title = 'pmx graph example';
     public $verticalLabel = 'This is MyData';
     public $lowerLimit = 0;
-    public $start="-14d";
-    public $end="now";
+    public $start = "-14d";
+    public $end = "now";
 
 
     //todo: maybe group them into one array?
@@ -40,41 +41,52 @@ class PmxRrdGraph
     public $graphHeight = 100;
 
     public $onlyGraph = false;
-    public $aliases ='';
+    public $aliases = '';
     public $dbPath;
     public $imagePath;
 
+    /**
+     * @param $dbLocation
+     * @param $imageLocation
+     */
     function __construct($dbLocation, $imageLocation)
     {
         $this->dbPath = $dbLocation;
         $this->imagePath = $imageLocation;
     }
 
-    public function setTitle($text) {
+    public function setTitle($text)
+    {
         $this->title = $text;
+
         return $this;
     }
 
-    public function setVerticalLabel($text) {
+    public function setVerticalLabel($text)
+    {
         $this->verticalLabel = $text;
+
         return $this;
     }
 
-    public function setLowerLimit( $lowerLimit = 0)
+    public function setLowerLimit($lowerLimit = 0)
     {
         $this->lowerLimit = $lowerLimit;
+
         return $this;
     }
 
     public function setStart($start = '-14d')
     {
         $this->start = $start;
+
         return $this;
     }
 
     public function setEnd($end = 'now')
     {
         $this->end = $end;
+
         return $this;
     }
 
@@ -82,8 +94,10 @@ class PmxRrdGraph
      * @param string $filename Absolute file location path. please.
      * @return PmxRrdGraph
      */
-    public function setFileName($filename){
+    public function setFileName($filename)
+    {
         $this->filename = $filename;
+
         return $this;
     }
 
@@ -97,10 +111,15 @@ class PmxRrdGraph
      * @param bool $stack
      * @return PmxRrdGraph
      */
-    public function line($varName, $legend, $hexColor=380470, $width=2, $stack = false)
+    public function line($varName, $legend, $hexColor = 380470, $width = 2, $stack = false)
     {
-        if($stack){ $stack = ':STACK'; } else { $stack = ''; }
-        $this->displayDataRules[] = "LINE$width:$varName#$hexColor:$legend".$stack;
+        if ($stack) {
+            $stack = ':STACK';
+        } else {
+            $stack = '';
+        }
+        $this->displayDataRules[] = "LINE$width:$varName#$hexColor:$legend" . $stack;
+
         return $this;
     }
 
@@ -112,6 +131,7 @@ class PmxRrdGraph
     public function shift($varName, $offsetTime)
     {
         $this->displayDataRules[] = "SHIFT:$varName:$offsetTime";
+
         return $this;
     }
 
@@ -123,10 +143,15 @@ class PmxRrdGraph
      * @param bool $stack
      * @return PmxRrdGraph
      */
-    public function area($varName, $legend, $hexColor=380470, $stack = false)
+    public function area($varName, $legend, $hexColor = 380470, $stack = false)
     {
-        if($stack){ $stack = ':STACK'; } else { $stack = ''; }
-        $this->displayDataRules[] = "AREA:$varName#$hexColor:$legend".$stack;
+        if ($stack) {
+            $stack = ':STACK';
+        } else {
+            $stack = '';
+        }
+        $this->displayDataRules[] = "AREA:$varName#$hexColor:$legend" . $stack;
+
         return $this;
     }
 
@@ -139,17 +164,17 @@ class PmxRrdGraph
      * @param null $yAxeTick
      * @return PmxRrdGraph
      */
-    public function tick($varName, $hexColor=001122, $legend = null, $yAxeTick =null )
+    public function tick($varName, $hexColor = 001122, $legend = null, $yAxeTick = null)
     {
 
-        if(!empty($yAxeTick))
-        {
+        if (!empty($yAxeTick)) {
             $suffix = ":$yAxeTick:$legend";
-        }else {
-            $suffix ='';
+        } else {
+            $suffix = '';
         }
 
-        $this->displayDataRules[] = "TICK:$varName#$hexColor".$suffix;
+        $this->displayDataRules[] = "TICK:$varName#$hexColor" . $suffix;
+
         return $this;
     }
 
@@ -157,108 +182,120 @@ class PmxRrdGraph
 
     // data definition
 
-    public function addDef($varName, $dsName, $consolidationFunction = 'AVERAGE', $fileName = null, $step = null, $start = null, $end = null, $reduceConsolidationFunction  = null)
+    /**
+     * @param string $varName
+     * @param string $dsName
+     * @param string $consolidationFunction
+     * @param null $fileName
+     * @param null $step
+     * @param null $start
+     * @param null $end
+     * @param null $reduceConsolidationFunction
+     * @return PmxRrdGraph
+     * @throws \RuntimeException
+     */
+    public function addDef($varName,$dsName,$consolidationFunction = 'AVERAGE',$fileName = null,$step = null,$start = null,$end = null,$reduceConsolidationFunction = null)
     {
-        if(empty($fileName)) {
+        if (empty($fileName)) {
             $fileName = $this->filename;
         }
-        if(!file_exists($fileName)) {
+        if (!file_exists($fileName)) {
             throw new RuntimeException('FUck Ya! try to use existed db');
         }
 
-        if(!empty($start)) {
+        if (!empty($start)) {
             $start = ":start=$start";
         }
 
-        if(!empty($end)) {
-            $end = ':end='.$end;
+        if (!empty($end)) {
+            $end = ':end=' . $end;
         }
 
-        if(empty($end) && !empty($start)) { $end = ':end=now'; }
+        if (empty($end) && !empty($start)) {
+            $end = ':end=now';
+        }
 
-        if(!in_array($dsName, $this->getDataSourceFromDb($fileName) ) )
-        {
+        //check if this DS exist in selected database file.
+        if (!in_array($dsName, $this->getDataSourceFromDb($fileName))) {
             throw new RuntimeException('Fyuck Ya! try to use existed DS');
         }
 
-        //todo: check for DS existance in selected filename;
-        $this->defs[] = "DEF:$varName=$fileName:$dsName:$consolidationFunction".$end.$start;
+        $this->defs[] = "DEF:$varName=$fileName:$dsName:$consolidationFunction" . $end . $start;
+
         return $this;
     }
 
+    /**
+     * @param string $varName
+     * @param string $reversePolishNotation
+     * @return PmxRrdGraph
+     */
     public function addCDef($varName, $reversePolishNotation)
     {
+        //todo: validate $varName
         $this->cdefs[] = "CDEF:$varName=$reversePolishNotation";
         return $this;
     }
 
+    /**
+     * @param string $varName
+     * @param string $reversePolishNotation
+     * @return PmxRrdGraph
+     */
     public function addVDef($varName, $reversePolishNotation)
     {
+        //todo: validate $varName
         $this->vdefs[] = "VDEF:$varName=$reversePolishNotation";
         return $this;
     }
-
     // end data definition
+
+
 
     public function getOptions()
     {
         $opt = array(
-            "--start", $this->start,
-
-            "--title=".$this->title,
-            "--vertical-label=".$this->verticalLabel,
-            "--lower-limit=".$this->lowerLimit,
-            "--width=".$this->graphWidth,
-            "--height=".$this->graphHeight,
+            "--start",
+            $this->start,
+            "--title=" . $this->title,
+            "--vertical-label=" . $this->verticalLabel,
+            "--lower-limit=" . $this->lowerLimit,
+            "--width=" . $this->graphWidth,
+            "--height=" . $this->graphHeight,
         );
 
-        if($this->onlyGraph) {
+        if ($this->onlyGraph) {
             $opt[] = '--only-graph';
         }
-        foreach($this->defs as $def) {
+        foreach ($this->defs as $def) {
             $opt[] = $def;
         }
-        foreach($this->cdefs as $def) {
+        foreach ($this->cdefs as $def) {
             $opt[] = $def;
         }
-        foreach($this->vdefs as $def) {
+        foreach ($this->vdefs as $def) {
             $opt[] = $def;
         }
-        foreach($this->displayDataRules as $lines) {
+        foreach ($this->displayDataRules as $lines) {
             $opt[] = $lines;
         }
+
         return $opt;
     }
 
 
     public function doDraw()
     {
-
-        echo "<pre>";
-        var_dump($this->getOptions());
-        $outputFileName = "x.png";
-
         $x = pathinfo($this->filename);
+        $outputFileName = $this->imagePath . $x['filename'] . '.png';
+        $ret = rrd_graph($outputFileName, $this->getOptions());
 
+        if (!is_array($ret)) {
+            $err = rrd_error();
+            var_dump($err);
 
-        $outputFileName = $this->imagePath.$x['filename'].'.png';
-
-        try{
-            $ret = rrd_graph($outputFileName, $this->getOptions());
-
-            if( !is_array($ret) )
-            {
-                $err = rrd_error();
-                var_dump($err);
-
-                echo "rrd_graph() ERROR: $err\n";
-            }
-
-        } catch( Exception $e) {
-            echo "hujeta";
+            throw new RuntimeException("rrd_graph() ERROR: $err\n");
         }
-
-
     }
 }
 

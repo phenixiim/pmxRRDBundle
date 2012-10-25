@@ -8,11 +8,10 @@
 namespace Pmx\Bundle\RrdBundle\Component;
 
 use JMS\AopBundle\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Pmx\Bundle\RrdBundle\Component\DSType;
 use Pmx\Bundle\RrdBundle\Component\RRAConsolidationFunction;
 
-class PmxRrdDatabase extends ContainerAware
+class PmxRrdDatabase
 {
 
     /**
@@ -66,6 +65,7 @@ class PmxRrdDatabase extends ContainerAware
     {
         //todo: simple setters for most features.
         rrd_tune($dbFileName, $options);
+        return $this;
     }
 
     /**

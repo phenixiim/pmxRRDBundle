@@ -6,8 +6,9 @@
  */
 class PmxRrdInfo
 {
-
+    /**@var string $filename file path */
     public $filename;
+    /** @var array $data with all information about database */
     public $data;
 
     /**
@@ -55,7 +56,8 @@ class PmxRrdInfo
         return array_keys($this->data['ds']);
     }
 
-    protected function add($key, $value, &$main_table) {
+    protected function add($key, $value, &$main_table)
+    {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
                 $this->add($k, $v, $main_table[$key]);
@@ -65,7 +67,8 @@ class PmxRrdInfo
         }
     }
 
-    protected function toobj($key, $value) {
+    protected function toobj($key, $value)
+    {
         $matches = array();
         if (preg_match('/^\\[(.*)\\]$/', $key, $matches)) {
             $key = $matches[1];
@@ -78,12 +81,13 @@ class PmxRrdInfo
                 $ret_val = array($matches[2] => array($k => $v));
             } else {
                 $ret_key = $matches[1];
-                $ret_val = array($matches[2] => array ($matches[3] => $value));
+                $ret_val = array($matches[2] => array($matches[3] => $value));
             }
         } else {
             $ret_key = $key;
             $ret_val = $value;
         }
+
         return array($ret_key, $ret_val);
     }
 }

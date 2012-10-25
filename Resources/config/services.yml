@@ -1,6 +1,6 @@
 parameters:
     pmx_rrd.rra_file_location: '/var/tmp/'
-    pmx_rrd.png_file_location: '/pmxrrd/images/'
+    pmx_rrd.png_file_location: '/bundles/pmxrrd/images/'
 
 services:
     pmx_rrd.graph:
