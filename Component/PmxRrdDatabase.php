@@ -27,7 +27,7 @@ class PmxRrdDatabase
     public $rraa = array();
 
     public $path;
-    public $dbname= 'test.rrd';
+    public $dbname = 'test.rrd';
     /** @var int step in seconds */
     public $step = 300;
 
@@ -41,9 +41,24 @@ class PmxRrdDatabase
      */
     public $start = 'now';
 
-    function __construct($path)
+    /**
+     * @param string $dbname database name(same as filename)
+     * @param string $path Location of rrdDatabase
+     */
+    function __construct($dbname = null, $path = null)
     {
+        if (empty($path)) {
+            $ref = new \ReflectionClass('AppKernel');
+            $dir = $ref->getFileName();
+            $path = realpath($dir) . '/rrd/';
+        } else {
+            //todo: check if exist path.
+        }
         $this->path = $path;
+
+        if (!empty($dbname)) {
+            $this->setDbName($dbname);
+        }
     }
 
 
@@ -53,13 +68,14 @@ class PmxRrdDatabase
      */
     public function setDbName($dbname)
     {
-        $this->dbname = $this->path.$dbname;
+        $this->dbname = $this->path . $dbname;
         return $this;
     }
 
     /**
      * @param $dbFileName
      * @param array $options
+     * @return PmxRrdDatabase
      */
     public function tune($dbFileName, array $options)
     {
@@ -77,19 +93,20 @@ class PmxRrdDatabase
      * @throws \JMS\AopBundle\Exception\RuntimeException
      * @throws \Exception
      */
-    public function create($overwriteFile = false) {
+    public function create($overwriteFile = false)
+    {
 
-        if(file_exists($this->dbname) && $overwriteFile == false) {
-            return $this;//TODO: figure out how to test it.
-            throw new RuntimeException('Database with filename = '.$this->dbname . ' already exist.');
+        if (file_exists($this->dbname) && $overwriteFile == false) {
+            return $this; //TODO: figure out how to test it.
+            throw new RuntimeException('Database with filename = ' . $this->dbname . ' already exist.');
         }
 
-        if(count($this->dsa) <1 ) {
+        if (count($this->dsa) < 1) {
             throw new RuntimeException('Database must have at least one DataSource ');
         }
 
 
-        if(count($this->rraa) <1 ) {
+        if (count($this->rraa) < 1) {
             throw new RuntimeException('Database must have at least one RRA');
         }
 
@@ -99,19 +116,17 @@ class PmxRrdDatabase
         );
 
 
-        foreach( $this->dsa as $ds)
-        {
+        foreach ($this->dsa as $ds) {
             $opts[] = $ds;
         }
 
-        foreach (  $this->rraa as $rra ) {
+        foreach ($this->rraa as $rra) {
             $opts[] = $rra;
         }
 
         //try to create db file
         $ret = rrd_create($this->dbname, $opts);
-        if( $ret == 0 )
-        {
+        if ($ret == 0) {
             $err = rrd_error();
             throw new \Exception("Create error: $err\n");
         }
@@ -128,12 +143,12 @@ class PmxRrdDatabase
      */
     public function update($dataSource, $value, $time = null)
     {
-        if(empty($time)) {
+        if (empty($time)) {
             $time = time();
         }
         $dataToUpdate[$this->dbname][$time] = array($dataSource => $value);
 
-       return $this;
+        return $this;
     }
 
     /**
@@ -145,11 +160,11 @@ class PmxRrdDatabase
     {
         $updater = new RRDUpdater($this->dbname);
 
-        foreach( $this->dataToUpdate as $dbName => $data) {
-            if($dbName != $this->dbname) {
+        foreach ($this->dataToUpdate as $dbName => $data) {
+            if ($dbName != $this->dbname) {
                 $updater = new RRDUpdater($dbName);
             }
-            foreach( $data as $timestamp => $value) {
+            foreach ($data as $timestamp => $value) {
                 $updater->update($value, $timestamp);
             }
         }
@@ -166,12 +181,12 @@ class PmxRrdDatabase
      * @return PmxRrdDatabase
      * @throws \RuntimeException
      */
-    public function addDataSource($name, $type, $heartbeat = null, $min = 'U', $max= 'U')
+    public function addDataSource($name, $type, $heartbeat = null, $min = 'U', $max = 'U')
     {
-        if(empty($heartbeat)) {
+        if (empty($heartbeat)) {
             $heartbeat = $this->step * 2;
         }
-        if(strlen($name) > 19) {
+        if (strlen($name) > 19) {
             throw new \RuntimeException('Data source name can\'t be longer then 19 symbols');
         }
         /**
@@ -190,9 +205,9 @@ class PmxRrdDatabase
      * @return PmxRrdDatabase
      * @throws \RuntimeException
      */
-    public function addRoundRobinArchive( $type, $reliability, $reportsOnCell, $cellCount)
+    public function addRoundRobinArchive($type, $reliability, $reportsOnCell, $cellCount)
     {
-        if($reliability > 1 || $reliability < 0) {
+        if ($reliability > 1 || $reliability < 0) {
             throw new \RuntimeException('reliability or x-доля, must be between 0 and 1  ');
         }
 

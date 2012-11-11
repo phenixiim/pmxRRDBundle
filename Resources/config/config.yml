@@ -1,0 +1,4 @@
+pmx_rrd:
+    rrd_path: /var/www/site.com/rrd
+    rrd_graph_path: /var/www/site.com/web/rrd
+    rrd_grapth_web_prefix: /rrd
