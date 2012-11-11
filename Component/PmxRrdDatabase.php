@@ -27,7 +27,7 @@ class PmxRrdDatabase
     public $rraa = array();
 
     public $path;
-    public $dbname = 'test.rrd';
+    public $dbname ;
     /** @var int step in seconds */
     public $step = 300;
 
@@ -45,7 +45,7 @@ class PmxRrdDatabase
      * @param string $dbname database name(same as filename)
      * @param string $path Location of rrdDatabase
      */
-    function __construct($dbname = null, $path = null)
+    function __construct($dbname = 'test.rrd', $path = null)
     {
         if (empty($path)) {
             $ref = new \ReflectionClass('AppKernel');

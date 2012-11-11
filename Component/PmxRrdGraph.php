@@ -11,7 +11,6 @@ use PmxRrdInfo;
 
 class PmxRrdGraph
 {
-
     public $filename;
 
     protected function getDataSourceFromDb($filename)
@@ -51,6 +50,7 @@ class PmxRrdGraph
      */
     function __construct($dbLocation, $imageLocation)
     {
+        //todo: add check if set/default/and passed
         $this->dbPath = $dbLocation;
         $this->imagePath = $imageLocation;
     }
@@ -194,7 +194,7 @@ class PmxRrdGraph
      * @return PmxRrdGraph
      * @throws \RuntimeException
      */
-    public function addDef($varName,$dsName,$consolidationFunction = 'AVERAGE',$fileName = null,$step = null,$start = null,$end = null,$reduceConsolidationFunction = null)
+    public function addDef($varName, $dsName, $consolidationFunction = 'AVERAGE', $fileName = null, $step = null, $start = null, $end = null, $reduceConsolidationFunction = null)
     {
         if (empty($fileName)) {
             $fileName = $this->filename;
@@ -248,8 +248,8 @@ class PmxRrdGraph
         $this->vdefs[] = "VDEF:$varName=$reversePolishNotation";
         return $this;
     }
-    // end data definition
 
+    // end data definition
 
 
     public function getOptions()
