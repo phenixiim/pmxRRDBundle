@@ -18,8 +18,10 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('pmx_rrd');
-
+        $rootNode = $treeBuilder->root('pmx_rrd')
+            ->children()
+                ->variableNode('rrd_database_location')->end()
+                ->variableNode('rrd_graph_web_location')->end();
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.

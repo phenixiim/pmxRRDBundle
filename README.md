@@ -7,6 +7,15 @@ Simple php mapper for RRD
  - rrdtool
  - php5-rrd extension
 
+## Configuration ##
+
+add to the config.yml
+```yml
+imports:
+    - { resource: parameters.yml }
+    - { resource: @PmxRrdBundle/Resources/config/config.yml}
+```
+
 # Usage guide
 
 ## Creating database file

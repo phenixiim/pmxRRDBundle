@@ -1,4 +1,3 @@
 pmx_rrd:
-    rrd_path: /var/www/site.com/rrd
-    rrd_graph_path: /var/www/site.com/web/rrd
-    rrd_grapth_web_prefix: /rrd
+    rrd_database_location : /var/www/databaselocation
+    rrd_graph_web_location : /var/www/public_place_for_png
