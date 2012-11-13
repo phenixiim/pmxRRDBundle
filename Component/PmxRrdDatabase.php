@@ -63,6 +63,12 @@ class PmxRrdDatabase
         }
     }
 
+    public function setStart($start)
+    {
+        $this->start = $start;
+        return $this;
+    }
+
     /**
      * @param $path
      * @return bool
@@ -84,6 +90,11 @@ class PmxRrdDatabase
         }
         $this->dbname = $this->path . $dbname;
         return $this;
+    }
+
+    public function getDatabaseName()
+    {
+        return $this->dbname;
     }
 
     /**
