@@ -50,10 +50,12 @@ class PmxRrdDatabase
         if (empty($path)) {
             $ref = new \ReflectionClass('AppKernel');
             $dir = $ref->getFileName();
-            $path = realpath($dir) . '/rrd/';
+            $path = dirname($dir) . '/Resources/rrd/';
         } else {
             //todo: check if exist path.
         }
+        $this->mkpath($path);
+
         $this->path = $path;
 
         if (!empty($dbname)) {
@@ -61,6 +63,15 @@ class PmxRrdDatabase
         }
     }
 
+    /**
+     * @param $path
+     * @return bool
+     */
+    protected function mkpath($path)
+    {
+        if(@mkdir($path) or file_exists($path)) return true;
+        return (mkpath(dirname($path)) and mkdir($path));
+    }
 
     /**
      * @param string $dbname
@@ -68,6 +79,9 @@ class PmxRrdDatabase
      */
     public function setDbName($dbname)
     {
+        if(substr($dbname, -4) != '.rrd') {
+            $dbname = $dbname.'.rrd';
+        }
         $this->dbname = $this->path . $dbname;
         return $this;
     }
