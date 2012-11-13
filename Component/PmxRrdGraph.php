@@ -308,7 +308,10 @@ class PmxRrdGraph
 
     public function doDraw()
     {
+
         $x = pathinfo($this->filename);
+        var_dump($this->getOptions());
+        var_dump(mktime(0,0,0,1,11,2012));
         $outputFileName = $this->imagePath . $x['filename'] . '.png';
         $ret = rrd_graph($outputFileName, $this->getOptions());
 

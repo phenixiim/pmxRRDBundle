@@ -31,6 +31,7 @@ class PmxRrdInfo
      */
     public function setFileName($filename)
     {
+        if(!file_exists($filename)) return false;
         //todo: validate if file is rrd database
         $this->filename = $filename;
         return $this;
@@ -59,6 +60,7 @@ class PmxRrdInfo
      */
     public function getInfo()
     {
+        if(empty($this->filename)) return false;
         if(empty($this->data)) {
             $this->transform();
         }

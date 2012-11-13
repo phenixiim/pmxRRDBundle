@@ -25,7 +25,7 @@ class PmxRrdGraphTest extends BaseTest
 
         //create DB;
         $pmxRrd->setDbName('router.rrd')
-            ->setStart(mktime(0,0,0,1,11,2012))
+            ->setStart(mktime(0,0,0,1,1,2012))
             ->addDataSource('input', DSType::COUNTER, 600)
             ->addDataSource('output', DSType::COUNTER, 600)
 
@@ -38,15 +38,19 @@ class PmxRrdGraphTest extends BaseTest
             ->addRoundRobinArchive(RRAConsolidationFunction::MAX, 0.5, 6, 700)
             ->addRoundRobinArchive(RRAConsolidationFunction::MAX, 0.5, 24, 775)
             ->addRoundRobinArchive(RRAConsolidationFunction::MAX, 0.5, 288, 797)
-        ->create();
+        ->create(true);
 
         //fill with data
         $minute = 0;
-        while(mktime(0,0,0,14,11,2012) > mktime(0,$minute,0,1,11,2012))
+        while($minute < 900)
         {
-            $pmxRrd->update('input', rand(1,255), mktime(0,$minute,0,1,11,2012));
+//            echo date("Y-m-d H:i:s",mktime(0,$minute,rand(1,55),1,11,2012) )."\n";
+//            echo $minute."\n";
+            $pmxRrd->update('input', rand(124,255), mktime(0,$minute,1,1,1,2012));
             $minute +=5;
+
         }
+
         $pmxRrd->doUpdate();
         //tune
 
@@ -54,12 +58,13 @@ class PmxRrdGraphTest extends BaseTest
         /** @var $pmxRrdGraph \Pmx\Bundle\RrdBundle\Component\PmxRrdGraph */
         $pmxRrdGraph = $this->get('pmx_rrd.graph');
         $pmxRrdGraph->setStart(mktime(0,0,0,1,11,2012))
+            ->setEnd(mktime(0,0,0,1,11,2012))
             ->setDbPath($pmxRrd->path)
             ->setImagePath($pmxRrd->path)
             ->setFileName($pmxRrd->getDatabaseName())
             ->addDef('inoctets', 'input')
-            ->addDef('outoctets', 'output')
-            ->area('inoctets', 'In Trafic', '00FF00')
+            ->addDef('outoctets', 'output', 'AVERAGE')
+            ->area('inoctets', 'In Trafic', '00FF00', 'AVERAGE')
             ->line('outoctets', 'Out traffic', '0000FF')
         ->doDraw();
             ;

@@ -27,7 +27,7 @@ class PmxRrdDatabase
     public $rraa = array();
 
     public $path;
-    public $dbname ;
+    public $dbname;
     /** @var int step in seconds */
     public $step = 300;
 
@@ -66,6 +66,7 @@ class PmxRrdDatabase
     public function setStart($start)
     {
         $this->start = $start;
+
         return $this;
     }
 
@@ -75,7 +76,10 @@ class PmxRrdDatabase
      */
     protected function mkpath($path)
     {
-        if(@mkdir($path) or file_exists($path)) return true;
+        if (@mkdir($path) or file_exists($path)) {
+            return true;
+        }
+
         return ($this->mkpath(dirname($path)) and mkdir($path));
     }
 
@@ -85,16 +89,17 @@ class PmxRrdDatabase
      */
     public function setDbName($dbname)
     {
-        if(substr($dbname, -4) != '.rrd') {
-            $dbname = $dbname.'.rrd';
+        if (substr($dbname, -4) != '.rrd') {
+            $dbname = $dbname . '.rrd';
         }
-        $this->dbname = $this->path . $dbname;
+        $this->dbname = $dbname;
+
         return $this;
     }
 
     public function getDatabaseName()
     {
-        return $this->dbname;
+        return $this->path . $this->dbname;
     }
 
     /**
@@ -121,23 +126,27 @@ class PmxRrdDatabase
     public function create($overwriteFile = false)
     {
 
-        if (file_exists($this->dbname) && $overwriteFile == false) {
-            return $this; //TODO: figure out how to test it.
-            throw new RuntimeException('Database with filename = ' . $this->dbname . ' already exist.');
+        if (file_exists($this->getDatabaseName())) {
+            if ($overwriteFile == false) {
+                throw new RuntimeException('Database with filename = ' . $this->getDataBaseName() . ' already exist.');
+            } else {
+                unlink($this->getDatabaseName());
+            }
         }
 
         if (count($this->dsa) < 1) {
             throw new RuntimeException('Database must have at least one DataSource ');
         }
 
-
         if (count($this->rraa) < 1) {
             throw new RuntimeException('Database must have at least one RRA');
         }
 
         $opts = array(
-            "--step", $this->step,
-            "--start", $this->start,
+            "--step",
+            $this->step,
+            "--start",
+            $this->start,
         );
 
 
@@ -150,7 +159,7 @@ class PmxRrdDatabase
         }
 
         //try to create db file
-        $ret = rrd_create($this->dbname, $opts);
+        $ret = rrd_create($this->getDatabaseName(), $opts);
         if ($ret == 0) {
             $err = rrd_error();
             throw new \Exception("Create error: $err\n");
@@ -171,7 +180,7 @@ class PmxRrdDatabase
         if (empty($time)) {
             $time = time();
         }
-        $dataToUpdate[$this->dbname][$time] = array($dataSource => $value);
+        $this->dataToUpdate[$this->getDatabaseName()][$time] = array($dataSource => $value);
 
         return $this;
     }
@@ -183,14 +192,17 @@ class PmxRrdDatabase
      */
     public function doUpdate()
     {
-        $updater = new \RRDUpdater($this->dbname);
+        $updater = new \RRDUpdater($this->getDatabaseName());
+
 
         foreach ($this->dataToUpdate as $dbName => $data) {
-            if ($dbName != $this->dbname) {
+            if ($dbName != $this->getDatabaseName()) {
                 $updater = new \RRDUpdater($dbName);
             }
+
             foreach ($data as $timestamp => $value) {
-                $updater->update($value, $timestamp);
+                $isOk = $updater->update($value, $timestamp);
+                if(!$isOk) throw new \RuntimeException('Ebala');
             }
         }
 
