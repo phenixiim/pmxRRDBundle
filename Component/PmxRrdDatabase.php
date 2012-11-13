@@ -183,11 +183,11 @@ class PmxRrdDatabase
      */
     public function doUpdate()
     {
-        $updater = new RRDUpdater($this->dbname);
+        $updater = new \RRDUpdater($this->dbname);
 
         foreach ($this->dataToUpdate as $dbName => $data) {
             if ($dbName != $this->dbname) {
-                $updater = new RRDUpdater($dbName);
+                $updater = new \RRDUpdater($dbName);
             }
             foreach ($data as $timestamp => $value) {
                 $updater->update($value, $timestamp);

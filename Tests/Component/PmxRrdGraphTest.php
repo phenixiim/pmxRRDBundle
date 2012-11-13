@@ -46,13 +46,21 @@ class PmxRrdGraphTest extends BaseTest
             $pmxRrd->update('input', rand(1,255), mktime(0,$minute,0,1,11,2012));
             $minute +=5;
         }
+        $pmxRrd->doUpdate();
         //tune
 
         //create image
         /** @var $pmxRrdGraph \Pmx\Bundle\RrdBundle\Component\PmxRrdGraph */
         $pmxRrdGraph = $this->get('pmx_rrd.graph');
-        $pmxRrdGraph->setStart(mktime(0,0,0,14,11,2012))
+        $pmxRrdGraph->setStart(mktime(0,0,0,1,11,2012))
+            ->setDbPath($pmxRrd->path)
+            ->setImagePath($pmxRrd->path)
             ->setFileName($pmxRrd->getDatabaseName())
+            ->addDef('inoctets', 'input')
+            ->addDef('outoctets', 'output')
+            ->area('inoctets', 'In Trafic', '00FF00')
+            ->line('outoctets', 'Out traffic', '0000FF')
+        ->doDraw();
             ;
         //check data from graph
     }

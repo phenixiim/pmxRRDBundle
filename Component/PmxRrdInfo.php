@@ -5,7 +5,7 @@
  * @date: 10/24/12
  */
 
-namespace Pmx\Bundle\PmxBundle\Component;
+namespace Pmx\Bundle\RrdBundle\Component;
 
 class PmxRrdInfo
 {
@@ -46,7 +46,7 @@ class PmxRrdInfo
         $this->data = array();
         $info = rrd_info($this->filename);
         foreach ($info as $ds_key => $ds_value) {
-            list ($key, $value) = $this->toobj($ds_key, $ds_value);
+            list ($key, $value) = self::toobj($ds_key, $ds_value);
             $this->add($key, $value, $this->data);
         }
 
@@ -83,7 +83,7 @@ class PmxRrdInfo
         }
     }
 
-    protected function toobj($key, $value)
+    protected static function toobj($key, $value)
     {
         $matches = array();
         if (preg_match('/^\\[(.*)\\]$/', $key, $matches)) {
@@ -93,7 +93,7 @@ class PmxRrdInfo
             $matches2 = array();
             if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $matches[3], $matches2)) {
                 $ret_key = $matches[1];
-                list($k, $v) = toobj($matches[3], $value);
+                list($k, $v) = self::toobj($matches[3], $value);
                 $ret_val = array($matches[2] => array($k => $v));
             } else {
                 $ret_key = $matches[1];

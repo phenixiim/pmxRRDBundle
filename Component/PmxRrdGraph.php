@@ -7,7 +7,6 @@
 namespace Pmx\Bundle\RrdBundle\Component;
 
 use RuntimeException;
-use PmxRrdInfo;
 
 class PmxRrdGraph
 {
@@ -15,7 +14,6 @@ class PmxRrdGraph
 
     protected function getDataSourceFromDb($filename)
     {
-
         $rrdInfo = new PmxRrdInfo($filename);
 
         return $rrdInfo->getDSNames();
@@ -48,7 +46,7 @@ class PmxRrdGraph
      * @param $dbLocation
      * @param $imageLocation
      */
-    function __construct($dbLocation, $imageLocation)
+    function __construct($dbLocation = null, $imageLocation = null)
     {
         //todo: add check if set/default/and passed
         $this->dbPath = $dbLocation;
@@ -60,6 +58,30 @@ class PmxRrdGraph
         $this->title = $text;
 
         return $this;
+    }
+
+    public function setDbPath($dbPath)
+    {
+        $this->dbPath = $dbPath;
+
+        return $this;
+    }
+
+    public function getDbPath()
+    {
+        return $this->dbPath;
+    }
+
+    public function setImagePath($imagePath)
+    {
+        $this->imagePath = $imagePath;
+
+        return $this;
+    }
+
+    public function getImagePath()
+    {
+        return $this->imagePath;
     }
 
     public function setVerticalLabel($text)
