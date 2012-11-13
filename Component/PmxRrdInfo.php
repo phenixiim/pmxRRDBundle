@@ -14,10 +14,23 @@ class PmxRrdInfo
     /**
      * @param string $filename Rrd database filename
      */
-    public function __construct($filename)
+    public function __construct($filename = null)
     {
+        if(!empty($filename)) {
+            $this->setFileName($filename);
+            $this->transform();
+        }
+    }
+
+    /**
+     * @param string $filename
+     * @return \PmxRrdInfo
+     */
+    public function setFileName($filename)
+    {
+        //todo: validate if file is rrd database
         $this->filename = $filename;
-        $this->transform();
+        return $this;
     }
 
     /**
