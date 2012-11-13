@@ -4,6 +4,9 @@
  * @author: pomaxa none <pomaxa@gmail.com>
  * @date: 10/24/12
  */
+
+namespace Pmx\Bundle\PmxBundle\Component;
+
 class PmxRrdInfo
 {
     /**@var string $filename file path */
@@ -24,7 +27,7 @@ class PmxRrdInfo
 
     /**
      * @param string $filename
-     * @return \PmxRrdInfo
+     * @return PmxRrdInfo
      */
     public function setFileName($filename)
     {
