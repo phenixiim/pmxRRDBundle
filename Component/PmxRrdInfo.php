@@ -74,6 +74,9 @@ class PmxRrdInfo
      */
     public function getDSNames()
     {
+        if(empty($this->data)) {
+            $this->getInfo();
+        }
         return array_keys($this->data['ds']);
     }
 

@@ -39,7 +39,6 @@ class PmxRrdGraph
 
     public $onlyGraph = false;
     public $aliases = '';
-    public $dbPath;
     public $imagePath;
 
     /**
@@ -58,18 +57,6 @@ class PmxRrdGraph
         $this->title = $text;
 
         return $this;
-    }
-
-    public function setDbPath($dbPath)
-    {
-        $this->dbPath = $dbPath;
-
-        return $this;
-    }
-
-    public function getDbPath()
-    {
-        return $this->dbPath;
     }
 
     public function setImagePath($imagePath)
@@ -279,6 +266,7 @@ class PmxRrdGraph
         $opt = array(
             "--start",
             $this->start,
+            "--end=".$this->end,
             "--title=" . $this->title,
             "--vertical-label=" . $this->verticalLabel,
             "--lower-limit=" . $this->lowerLimit,
@@ -310,15 +298,11 @@ class PmxRrdGraph
     {
 
         $x = pathinfo($this->filename);
-        var_dump($this->getOptions());
-        var_dump(mktime(0,0,0,1,11,2012));
         $outputFileName = $this->imagePath . $x['filename'] . '.png';
-        $ret = rrd_graph($outputFileName, $this->getOptions());
 
+        $ret = rrd_graph($outputFileName, $this->getOptions());
         if (!is_array($ret)) {
             $err = rrd_error();
-            var_dump($err);
-
             throw new RuntimeException("rrd_graph() ERROR: $err\n");
         }
     }
