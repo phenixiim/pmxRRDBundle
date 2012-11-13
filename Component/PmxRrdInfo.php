@@ -36,11 +36,6 @@ class PmxRrdInfo
         return $this;
     }
 
-    public function alias_rrd_info()
-    {
-        return rrd_info($this->filename);
-    }
-
     /**
      * transform info from rrd_info into nice array.
      *
@@ -52,7 +47,7 @@ class PmxRrdInfo
         $info = rrd_info($this->filename);
         foreach ($info as $ds_key => $ds_value) {
             list ($key, $value) = $this->toobj($ds_key, $ds_value);
-            $this->add($key, $value);
+            $this->add($key, $value, $this->data);
         }
 
         return $this;
@@ -64,8 +59,7 @@ class PmxRrdInfo
      */
     public function getInfo()
     {
-        if(empty($this->data))
-        {
+        if(empty($this->data)) {
             $this->transform();
         }
         return $this->data;
@@ -81,14 +75,14 @@ class PmxRrdInfo
         return array_keys($this->data['ds']);
     }
 
-    protected function add($key, $value)
+    protected function add($key, $value, &$main_table)
     {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                $this->add($k, $v);
+                $this->add($k, $v, $main_table[$key]);
             }
         } else {
-            $this->data[$key] = $value;
+            $main_table[$key] = $value;
         }
     }
 
