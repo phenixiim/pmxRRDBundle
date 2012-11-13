@@ -4,6 +4,7 @@ Simple php mapper for RRD
 
 ## Prerequierments ##
  - Symfony 2.*
+ - rrdtool
  - php5-rrd extension
 
 # Usage guide

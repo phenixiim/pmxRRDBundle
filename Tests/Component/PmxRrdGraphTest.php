@@ -17,6 +17,14 @@ class PmxRrdGraphTest extends BaseTest
 
     public $dbFileName = "/tmp/myrouter33.rrd";
 
+
+    public function testPmxRrdInfo()
+    {
+        /** @var $rrdInfo \Pmx\Bundle\RrdBundle\Component\PmxRrdInfo */
+        $rrdInfo = $this->get('pmx_rrd.info');
+        $rrdInfo->setFileName('/var/www/rrdBundle/app/Resources/rrd/router.rrd');
+    }
+
     public function testDatabase()
     {
         /** @var $pmxRrd \Pmx\Bundle\RrdBundle\Component\PmxRrdDatabase */
@@ -64,6 +72,7 @@ class PmxRrdGraphTest extends BaseTest
             ;
         //check data from graph
     }
+
 
 
 //

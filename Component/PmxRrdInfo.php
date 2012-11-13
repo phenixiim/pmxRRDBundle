@@ -36,6 +36,11 @@ class PmxRrdInfo
         return $this;
     }
 
+    public function alias_rrd_info()
+    {
+        return rrd_info($this->filename);
+    }
+
     /**
      * transform info from rrd_info into nice array.
      *
@@ -46,8 +51,8 @@ class PmxRrdInfo
         $this->data = array();
         $info = rrd_info($this->filename);
         foreach ($info as $ds_key => $ds_value) {
-            list ($key, $value) = self::toobj($ds_key, $ds_value);
-            $this->add($key, $value, $this->data);
+            list ($key, $value) = $this->toobj($ds_key, $ds_value);
+            $this->add($key, $value);
         }
 
         return $this;
@@ -59,6 +64,10 @@ class PmxRrdInfo
      */
     public function getInfo()
     {
+        if(empty($this->data))
+        {
+            $this->transform();
+        }
         return $this->data;
     }
 
@@ -72,18 +81,18 @@ class PmxRrdInfo
         return array_keys($this->data['ds']);
     }
 
-    protected function add($key, $value, &$main_table)
+    protected function add($key, $value)
     {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                $this->add($k, $v, $main_table[$key]);
+                $this->add($k, $v);
             }
         } else {
-            $main_table[$key] = $value;
+            $this->data[$key] = $value;
         }
     }
 
-    protected static function toobj($key, $value)
+    protected function toobj($key, $value)
     {
         $matches = array();
         if (preg_match('/^\\[(.*)\\]$/', $key, $matches)) {
@@ -93,7 +102,7 @@ class PmxRrdInfo
             $matches2 = array();
             if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $matches[3], $matches2)) {
                 $ret_key = $matches[1];
-                list($k, $v) = self::toobj($matches[3], $value);
+                list($k, $v) = $this->toobj($matches[3], $value);
                 $ret_val = array($matches[2] => array($k => $v));
             } else {
                 $ret_key = $matches[1];

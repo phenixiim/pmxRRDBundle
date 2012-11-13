@@ -9,6 +9,8 @@ services:
     pmx_rrd.db:
         class: Pmx\Bundle\RrdBundle\Component\PmxRrdDatabase
         arguments: [%pmx_rrd.png_file_location%]
+    pmx_rrd.info:
+        class: Pmx\Bundle\RrdBundle\Component\PmxRrdInfo
     pmx_rrd.twig.extension:
            class: Pmx\Bundle\RrdBundle\Twig\PmxRrdExtension
            arguments: [@service_container]
