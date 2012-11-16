@@ -13,7 +13,6 @@ use Pmx\Bundle\RrdBundle\Component\RRAConsolidationFunction;
 
 class PmxRrdDatabase
 {
-
     /**
      * для получения текущего значения отсчета предыдущее значение счетчика
      * вычитается из текущего и делится на интервал между отсчетами
@@ -45,17 +44,9 @@ class PmxRrdDatabase
      * @param string $dbname database name(same as filename)
      * @param string $path Location of rrdDatabase
      */
-    function __construct($dbname = 'test.rrd', $path = null)
+    public function __construct($dbname = 'test.rrd', $path = null)
     {
-        if (empty($path)) {
-            $ref = new \ReflectionClass('AppKernel');
-            $dir = $ref->getFileName();
-            $path = dirname($dir) . '/Resources/rrd/';
-        } else {
-            //todo: check if exist path.
-        }
         $this->mkpath($path);
-
         $this->path = $path;
 
         if (!empty($dbname)) {
@@ -92,6 +83,7 @@ class PmxRrdDatabase
         if (substr($dbname, -4) != '.rrd') {
             $dbname = $dbname . '.rrd';
         }
+
         $this->dbname = $dbname;
 
         return $this;
@@ -99,7 +91,7 @@ class PmxRrdDatabase
 
     public function getDatabaseName()
     {
-        return $this->path . $this->dbname;
+        return $this->path . '/' . $this->dbname;
     }
 
     /**
@@ -125,7 +117,6 @@ class PmxRrdDatabase
      */
     public function create($overwriteFile = false)
     {
-
         if (file_exists($this->getDatabaseName())) {
             if ($overwriteFile == false) {
                 throw new RuntimeException('Database with filename = ' . $this->getDataBaseName() . ' already exist.');
@@ -149,7 +140,6 @@ class PmxRrdDatabase
             $this->start,
         );
 
-
         foreach ($this->dsa as $ds) {
             $opts[] = $ds;
         }
@@ -160,6 +150,7 @@ class PmxRrdDatabase
 
         //try to create db file
         $ret = rrd_create($this->getDatabaseName(), $opts);
+
         if ($ret == 0) {
             $err = rrd_error();
             throw new \Exception("Create error: $err\n");
@@ -167,7 +158,6 @@ class PmxRrdDatabase
 
         return $this;
     }
-
 
     /**
      * @param $dataSource
@@ -180,6 +170,7 @@ class PmxRrdDatabase
         if (empty($time)) {
             $time = time();
         }
+
         $this->dataToUpdate[$this->getDatabaseName()][$time] = array($dataSource => $value);
 
         return $this;
@@ -189,11 +180,11 @@ class PmxRrdDatabase
      * Actually update database
      *
      * @return PmxRrdDatabase
+     * @throws \RuntimeException
      */
     public function doUpdate()
     {
         $updater = new \RRDUpdater($this->getDatabaseName());
-
 
         foreach ($this->dataToUpdate as $dbName => $data) {
             if ($dbName != $this->getDatabaseName()) {
@@ -202,7 +193,10 @@ class PmxRrdDatabase
 
             foreach ($data as $timestamp => $value) {
                 $isOk = $updater->update($value, $timestamp);
-                if(!$isOk) throw new \RuntimeException('Ebala');
+
+                if (!$isOk) {
+                    throw new \RuntimeException('Ebala');
+                }
             }
         }
 
@@ -223,6 +217,7 @@ class PmxRrdDatabase
         if (empty($heartbeat)) {
             $heartbeat = $this->step * 2;
         }
+
         if (strlen($name) > 19) {
             throw new \RuntimeException('Data source name can\'t be longer then 19 symbols');
         }
@@ -245,7 +240,7 @@ class PmxRrdDatabase
     public function addRoundRobinArchive($type, $reliability, $reportsOnCell, $cellCount)
     {
         if ($reliability > 1 || $reliability < 0) {
-            throw new \RuntimeException('reliability or x-доля, must be between 0 and 1  ');
+            throw new \RuntimeException('reliability or x-доля, must be between 0 and 1');
         }
 
 //        x-доля определяет долю неопределённых значений в интервале консолидации, при которой консолидированное значение ещё считается определённым (от 0 до 1).

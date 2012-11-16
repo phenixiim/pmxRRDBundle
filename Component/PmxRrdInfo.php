@@ -19,7 +19,7 @@ class PmxRrdInfo
      */
     public function __construct($filename = null)
     {
-        if(!empty($filename)) {
+        if (!empty($filename)) {
             $this->setFileName($filename);
             $this->transform();
         }
@@ -31,9 +31,13 @@ class PmxRrdInfo
      */
     public function setFileName($filename)
     {
-        if(!file_exists($filename)) return false;
+        if (!file_exists($filename)) {
+            return false;
+        }
+
         //todo: validate if file is rrd database
         $this->filename = $filename;
+
         return $this;
     }
 
@@ -46,6 +50,7 @@ class PmxRrdInfo
     {
         $this->data = array();
         $info = rrd_info($this->filename);
+
         foreach ($info as $ds_key => $ds_value) {
             list ($key, $value) = $this->toobj($ds_key, $ds_value);
             $this->add($key, $value, $this->data);
@@ -60,10 +65,14 @@ class PmxRrdInfo
      */
     public function getInfo()
     {
-        if(empty($this->filename)) return false;
-        if(empty($this->data)) {
+        if (empty($this->filename)) {
+            return false;
+        }
+
+        if (empty($this->data)) {
             $this->transform();
         }
+
         return $this->data;
     }
 
@@ -74,9 +83,10 @@ class PmxRrdInfo
      */
     public function getDSNames()
     {
-        if(empty($this->data)) {
+        if (empty($this->data)) {
             $this->getInfo();
         }
+
         return array_keys($this->data['ds']);
     }
 
@@ -94,11 +104,14 @@ class PmxRrdInfo
     protected function toobj($key, $value)
     {
         $matches = array();
+
         if (preg_match('/^\\[(.*)\\]$/', $key, $matches)) {
             $key = $matches[1];
         }
+
         if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $key, $matches)) {
             $matches2 = array();
+
             if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $matches[3], $matches2)) {
                 $ret_key = $matches[1];
                 list($k, $v) = $this->toobj($matches[3], $value);
