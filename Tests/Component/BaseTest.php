@@ -8,7 +8,7 @@ namespace Pmx\Bundle\RrdBundle\Test\Component;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-require_once __DIR__ . '/../../../../../../app/AppKernel.php';
+require_once __DIR__ . '/../../../../../../../../app/AppKernel.php';
 
 abstract class BaseTest extends WebTestCase
 {

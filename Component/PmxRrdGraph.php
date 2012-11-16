@@ -4,6 +4,7 @@
  * @author: pomaxa none <pomaxa@gmail.com>
  * @date: 10/19/12
  */
+
 namespace Pmx\Bundle\RrdBundle\Component;
 
 use RuntimeException;
@@ -12,19 +13,11 @@ class PmxRrdGraph
 {
     public $filename;
 
-    protected function getDataSourceFromDb($filename)
-    {
-        $rrdInfo = new PmxRrdInfo($filename);
-
-        return $rrdInfo->getDSNames();
-    }
-
     public $title = 'pmx graph example';
     public $verticalLabel = 'This is MyData';
     public $lowerLimit = 0;
     public $start = "-14d";
     public $end = "now";
-
 
     //todo: maybe group them into one array?
     public $defs = array();
@@ -45,11 +38,18 @@ class PmxRrdGraph
      * @param $dbLocation
      * @param $imageLocation
      */
-    function __construct($dbLocation = null, $imageLocation = null)
+    public function __construct($dbLocation = null, $imageLocation = null)
     {
         //todo: add check if set/default/and passed
         $this->dbPath = $dbLocation;
         $this->imagePath = $imageLocation;
+    }
+
+    protected function getDataSourceFromDb($filename)
+    {
+        $rrdInfo = new PmxRrdInfo($filename);
+
+        return $rrdInfo->getDSNames();
     }
 
     public function setTitle($text)
@@ -298,7 +298,7 @@ class PmxRrdGraph
     {
 
         $x = pathinfo($this->filename);
-        $outputFileName = $this->imagePath . $x['filename'] . '.png';
+        $outputFileName = $this->imagePath . '/' . $x['filename'] . '.png';
 
         $ret = rrd_graph($outputFileName, $this->getOptions());
         if (!is_array($ret)) {
