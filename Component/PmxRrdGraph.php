@@ -8,7 +8,6 @@
 namespace Pmx\Bundle\RrdBundle\Component;
 
 use RuntimeException;
-
 class PmxRrdGraph
 {
     public $filename;
@@ -23,7 +22,6 @@ class PmxRrdGraph
     public $defs = array();
     public $cdefs = array();
     public $vdefs = array();
-
 
     public $displayDataRules = array();
 
@@ -127,6 +125,7 @@ class PmxRrdGraph
         } else {
             $stack = '';
         }
+
         $this->displayDataRules[] = "LINE$width:$varName#$hexColor:$legend" . $stack;
 
         return $this;
@@ -144,7 +143,6 @@ class PmxRrdGraph
         return $this;
     }
 
-
     /**
      * @param $varName
      * @param $legend
@@ -159,11 +157,11 @@ class PmxRrdGraph
         } else {
             $stack = '';
         }
+
         $this->displayDataRules[] = "AREA:$varName#$hexColor:$legend" . $stack;
 
         return $this;
     }
-
 
     /**
      * TICK:имя-переменной#rrggbbaa[:доля-от-оси-Y[:легенда]] (вертикальные засечки на месте каждого определённого и ненулевого значения переменной)
@@ -175,7 +173,6 @@ class PmxRrdGraph
      */
     public function tick($varName, $hexColor = 001122, $legend = null, $yAxeTick = null)
     {
-
         if (!empty($yAxeTick)) {
             $suffix = ":$yAxeTick:$legend";
         } else {
@@ -208,6 +205,7 @@ class PmxRrdGraph
         if (empty($fileName)) {
             $fileName = $this->filename;
         }
+
         if (!file_exists($fileName)) {
             throw new RuntimeException('FUck Ya! try to use existed db');
         }
@@ -260,13 +258,12 @@ class PmxRrdGraph
 
     // end data definition
 
-
     public function getOptions()
     {
         $opt = array(
             "--start",
             $this->start,
-            "--end=".$this->end,
+            "--end=" . $this->end,
             "--title=" . $this->title,
             "--vertical-label=" . $this->verticalLabel,
             "--lower-limit=" . $this->lowerLimit,
@@ -277,15 +274,19 @@ class PmxRrdGraph
         if ($this->onlyGraph) {
             $opt[] = '--only-graph';
         }
+
         foreach ($this->defs as $def) {
             $opt[] = $def;
         }
+
         foreach ($this->cdefs as $def) {
             $opt[] = $def;
         }
+
         foreach ($this->vdefs as $def) {
             $opt[] = $def;
         }
+
         foreach ($this->displayDataRules as $lines) {
             $opt[] = $lines;
         }
@@ -293,14 +294,12 @@ class PmxRrdGraph
         return $opt;
     }
 
-
     public function doDraw()
     {
-
         $x = pathinfo($this->filename);
         $outputFileName = $this->imagePath . '/' . $x['filename'] . '.png';
-
         $ret = rrd_graph($outputFileName, $this->getOptions());
+
         if (!is_array($ret)) {
             $err = rrd_error();
             throw new RuntimeException("rrd_graph() ERROR: $err\n");

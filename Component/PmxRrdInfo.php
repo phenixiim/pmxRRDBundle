@@ -11,6 +11,7 @@ class PmxRrdInfo
 {
     /**@var string $filename file path */
     public $filename;
+
     /** @var array $data with all information about database */
     public $data;
 
@@ -46,13 +47,13 @@ class PmxRrdInfo
      *
      * @return PmxRrdInfo
      */
-    function transform()
+    private function transform()
     {
         $this->data = array();
         $info = rrd_info($this->filename);
 
         foreach ($info as $ds_key => $ds_value) {
-            list ($key, $value) = $this->toobj($ds_key, $ds_value);
+            list ($key, $value) = $this->transformInfo($ds_key, $ds_value);
             $this->add($key, $value, $this->data);
         }
 
@@ -101,7 +102,7 @@ class PmxRrdInfo
         }
     }
 
-    protected function toobj($key, $value)
+    protected function transformInfo($key, $value)
     {
         $matches = array();
 
@@ -114,7 +115,7 @@ class PmxRrdInfo
 
             if (preg_match('/(.*?)\\[(.*?)\\]\\.(.*)/', $matches[3], $matches2)) {
                 $ret_key = $matches[1];
-                list($k, $v) = $this->toobj($matches[3], $value);
+                list($k, $v) = $this->transformInfo($matches[3], $value);
                 $ret_val = array($matches[2] => array($k => $v));
             } else {
                 $ret_key = $matches[1];
