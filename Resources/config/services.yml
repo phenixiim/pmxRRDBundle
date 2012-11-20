@@ -1,7 +1,7 @@
 services:
     pmx_rrd.graph:
         class: Pmx\Bundle\RrdBundle\Component\PmxRrdGraph
-        arguments: [%pmx_rrd.database_location%, %pmx_rrd.graph_location%]
+        arguments: [%pmx_rrd.database_location%, %pmx_rrd.graph_location%, @service_container]
 
     pmx_rrd.db:
         class: Pmx\Bundle\RrdBundle\Component\PmxRrdDatabase
@@ -11,7 +11,7 @@ services:
         class: Pmx\Bundle\RrdBundle\Component\PmxRrdInfo
 
     pmx_rrd.twig.extension:
-           class: Pmx\Bundle\RrdBundle\Twig\PmxRrdExtension
-           arguments: [@pmx_rrd.graph]
-           tags:
-             -  { name: twig.extension }
+        class: Pmx\Bundle\RrdBundle\Twig\PmxRrdExtension
+        arguments: [@service_container]
+        tags:
+            -  { name: twig.extension }
