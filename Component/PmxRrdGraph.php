@@ -8,13 +8,15 @@
 namespace Pmx\Bundle\RrdBundle\Component;
 
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Container;
+
 class PmxRrdGraph
 {
     public $filename;
 
-    public $title = 'pmx graph example';
-    public $verticalLabel = 'This is MyData';
-    public $lowerLimit = 0;
+    public $title;
+    public $verticalLabel;
+    public $lowerLimit = null;
     public $start = "-14d";
     public $end = "now";
 
@@ -29,18 +31,22 @@ class PmxRrdGraph
     public $graphHeight = 100;
 
     public $onlyGraph = false;
+    public $fullSizeMode = false;
     public $aliases = '';
     public $imagePath;
+    public $imageName = null;
+
+    private $container = null;
 
     /**
      * @param $dbLocation
      * @param $imageLocation
      */
-    public function __construct($dbLocation = null, $imageLocation = null)
+    public function __construct($dbLocation = null, $imageLocation = null, Container $container)
     {
-        //todo: add check if set/default/and passed
         $this->dbPath = $dbLocation;
         $this->imagePath = $imageLocation;
+        $this->container = $container;
     }
 
     protected function getDataSourceFromDb($filename)
@@ -104,6 +110,51 @@ class PmxRrdGraph
     public function setFileName($filename)
     {
         $this->filename = $filename;
+
+        return $this;
+    }
+
+    public function setImageName($imageName)
+    {
+        $this->imageName = $imageName;
+
+        return $this;
+    }
+
+    public function getImageName()
+    {
+        if (null == $this->imageName) {
+            $info = pathinfo($this->filename);
+            $this->imageName = $info['filename'];
+        }
+
+        return $this->imageName;
+    }
+
+    public function getImageUrl()
+    {
+        $webImagePath = str_replace($this->container->get('kernel')->getRootDir() . '/../web', '', $this->imagePath);
+
+        return $this->container->get('request')->getBasePath() . sprintf('%s/%s.png', $webImagePath, $this->getImageName());
+    }
+
+    public function setGraphWidth($width)
+    {
+        $this->graphWidth = $width;
+
+        return $this;
+    }
+
+    public function setGraphHeight($height)
+    {
+        $this->graphHeight = $height;
+
+        return $this;
+    }
+
+    public function setFullSizeMode($fullSizeMode)
+    {
+        $this->fullSizeMode = $fullSizeMode;
 
         return $this;
     }
@@ -261,19 +312,34 @@ class PmxRrdGraph
     public function getOptions()
     {
         $opt = array(
-            "--start",
+            '--start',
             $this->start,
-            "--end=" . $this->end,
-            "--title=" . $this->title,
-            "--vertical-label=" . $this->verticalLabel,
-            "--lower-limit=" . $this->lowerLimit,
-            "--width=" . $this->graphWidth,
-            "--height=" . $this->graphHeight,
+            '--end=' . $this->end,
+            '--width=' . $this->graphWidth,
+            '--height=' . $this->graphHeight,
         );
+
+        if ($this->fullSizeMode) {
+            $opt[] = '-D';
+        }
 
         if ($this->onlyGraph) {
             $opt[] = '--only-graph';
         }
+
+        if (null !== $this->title) {
+            $opt[] = '--title=' . $this->title;
+        }
+
+        if (null !== $this->verticalLabel) {
+            $opt[] = '--vertical-label=' . $this->verticalLabel;
+        }
+
+        if (null !== $this->lowerLimit) {
+            $opt[] = '--lower-limit=' . $this->lowerLimit;
+        }
+
+
 
         foreach ($this->defs as $def) {
             $opt[] = $def;
@@ -296,14 +362,14 @@ class PmxRrdGraph
 
     public function doDraw()
     {
-        $x = pathinfo($this->filename);
-        $outputFileName = $this->imagePath . '/' . $x['filename'] . '.png';
-        $ret = rrd_graph($outputFileName, $this->getOptions());
+        $outputFileName = sprintf('%s/%s.png', $this->imagePath, $this->getImageName());
+        $parameters = rrd_graph($outputFileName, $this->getOptions());
 
-        if (!is_array($ret)) {
-            $err = rrd_error();
-            throw new RuntimeException("rrd_graph() ERROR: $err\n");
+        if (false !== $error = rrd_error()) {
+            throw new RuntimeException(sprintf('rrd_graph() ERROR: %s', $error));
         }
+
+        return $parameters;
     }
 }
 

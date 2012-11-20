@@ -32,7 +32,11 @@ class PmxRrdExtension extends \Twig_Extension
             $path = $this->container->get('pmx_rrd.graph_location');
         }
 
-        return sprintf('%s/%s.png', $path, $databaseName);
+        $rrdGraph = $this->container->get('pmx_rrd.graph')
+            ->setImagePath($path)
+            ->setImageName($databaseName);
+
+        return $rrdGraph->getImageUrl();
     }
 
     public function getName()
