@@ -12,6 +12,6 @@ services:
 
     pmx_rrd.twig.extension:
         class: Pmx\Bundle\RrdBundle\Twig\PmxRrdExtension
-        arguments: [@service_container]
+        arguments: [@pmx_rrd.graph]
         tags:
             -  { name: twig.extension }

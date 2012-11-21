@@ -2,13 +2,15 @@
 
 namespace Pmx\Bundle\RrdBundle\Twig;
 
+use Pmx\Bundle\RrdBundle\Component\PmxRrdGraph;
+
 class PmxRrdExtension extends \Twig_Extension
 {
-    protected $container;
+    protected $graph;
 
-    public function __construct($container)
+    public function __construct(PmxRrdGraph $graph)
     {
-        $this->container = $container;
+        $this->graph = $graph;
     }
 
     public function getFilters()
@@ -23,20 +25,18 @@ class PmxRrdExtension extends \Twig_Extension
     {
         $url = $this->getRrdImageUrl($databaseName, $path);
 
-        return sprintf('<img src="%s" />', $url);
+        return sprintf('<img src="%s" alt="rrd graph" />', $url);
     }
 
     public function getRrdImageUrl($databaseName, $path = null)
     {
-        if (null === $path) {
-            $path = $this->container->get('pmx_rrd.graph_location');
+        $this->graph->setImageName($databaseName);
+
+        if (null !== $path) {
+            $this->graph->setImagePath($path);
         }
 
-        $rrdGraph = $this->container->get('pmx_rrd.graph')
-            ->setImagePath($path)
-            ->setImageName($databaseName);
-
-        return $rrdGraph->getImageUrl();
+        return $this->graph->getImageUrl();
     }
 
     public function getName()
