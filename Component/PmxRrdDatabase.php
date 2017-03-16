@@ -1,6 +1,7 @@
 <?php
 /**
  * Created by JetBrains PhpStorm.
+ *
  * @author: pomaxa none <pomaxa@gmail.com>
  * @date: 10/18/12
  */
@@ -50,7 +51,7 @@ class PmxRrdDatabase
         if (empty($path)) {
             $ref = new \ReflectionClass('AppKernel');
             $dir = $ref->getFileName();
-            $path = dirname($dir) . '/Resources/rrd/';
+            $path = dirname($dir).'/Resources/rrd/';
         } else {
             //todo: check if exist path.
         }
@@ -63,6 +64,13 @@ class PmxRrdDatabase
         }
     }
 
+    public function setPath(string $path)
+    {
+        $this->mkpath($path);
+
+        $this->path = $path;
+    }
+
     public function setStart($start)
     {
         $this->start = $start;
@@ -71,26 +79,14 @@ class PmxRrdDatabase
     }
 
     /**
-     * @param $path
-     * @return bool
-     */
-    protected function mkpath($path)
-    {
-        if (@mkdir($path) or file_exists($path)) {
-            return true;
-        }
-
-        return ($this->mkpath(dirname($path)) and mkdir($path));
-    }
-
-    /**
      * @param string $dbname
+     *
      * @return PmxRrdDatabase
      */
     public function setDbName($dbname)
     {
         if (substr($dbname, -4) != '.rrd') {
-            $dbname = $dbname . '.rrd';
+            $dbname = $dbname.'.rrd';
         }
         $this->dbname = $dbname;
 
@@ -99,12 +95,13 @@ class PmxRrdDatabase
 
     public function getDatabaseName()
     {
-        return $this->path . $this->dbname;
+        return $this->path.$this->dbname;
     }
 
     /**
-     * @param $dbFileName
+     * @param       $dbFileName
      * @param array $options
+     *
      * @return PmxRrdDatabase
      */
     public function tune($dbFileName, array $options)
@@ -119,6 +116,7 @@ class PmxRrdDatabase
      * Write down  file
      *
      * @param bool $overwriteFile
+     *
      * @return PmxRrdDatabase
      * @throws \JMS\AopBundle\Exception\RuntimeException
      * @throws \Exception
@@ -128,7 +126,7 @@ class PmxRrdDatabase
 
         if (file_exists($this->getDatabaseName())) {
             if ($overwriteFile == false) {
-                throw new RuntimeException('Database with filename = ' . $this->getDataBaseName() . ' already exist.');
+                throw new RuntimeException('Database with filename = '.$this->getDataBaseName().' already exist.');
             } else {
                 unlink($this->getDatabaseName());
             }
@@ -168,11 +166,18 @@ class PmxRrdDatabase
         return $this;
     }
 
+    public function setStep(int $step)
+    {
+        $this->step = $step;
+
+        return $this;
+    }
 
     /**
-     * @param $dataSource
-     * @param $value
+     * @param                $dataSource
+     * @param                $value
      * @param null|timestamp $time
+     *
      * @return PmxRrdDatabase
      */
     public function update($dataSource, $value, $time = null)
@@ -180,7 +185,7 @@ class PmxRrdDatabase
         if (empty($time)) {
             $time = time();
         }
-        $this->dataToUpdate[$this->getDatabaseName()][$time] = array($dataSource => $value);
+        $this->dataToUpdate[$this->getDatabaseName()][$time][$dataSource] = $value;
 
         return $this;
     }
@@ -202,7 +207,9 @@ class PmxRrdDatabase
 
             foreach ($data as $timestamp => $value) {
                 $isOk = $updater->update($value, $timestamp);
-                if(!$isOk) throw new \RuntimeException('Ebala');
+                if (!$isOk) {
+                    throw new \RuntimeException('Ebala');
+                }
             }
         }
 
@@ -210,11 +217,12 @@ class PmxRrdDatabase
     }
 
     /**
-     * @param $name
+     * @param        $name
      * @param DSType $type
-     * @param $heartbeat interval; by default it is calculated as 2*step
+     * @param        $heartbeat interval; by default it is calculated as 2*step
      * @param string $min Default U, if defined, then any value lower then defined, will be ignored in calculations
      * @param string $max Default U, if defined, then any value grater then defined, will be ignored in calculations
+     *
      * @return PmxRrdDatabase
      * @throws \RuntimeException
      */
@@ -227,7 +235,7 @@ class PmxRrdDatabase
             throw new \RuntimeException('Data source name can\'t be longer then 19 symbols');
         }
         /**
-        DS:имя_источника:тип_источника:интервал_определенности:min:max \
+         * DS:имя_источника:тип_источника:интервал_определенности:min:max \
          */
         $this->dsa[] = "DS:$name:$type:$heartbeat:$min:$max";
 
@@ -236,9 +244,10 @@ class PmxRrdDatabase
 
     /**
      * @param RRAConsolidationFunction $type
-     * @param float $reliability xдоля определяет долю неопределённых значений в интервале консолидации, при которой консолидированное значение ещё считается определённым (от 0 до 1).
-     * @param $reportsOnCell
-     * @param $cellCount
+     * @param float                    $reliability xдоля определяет долю неопределённых значений в интервале консолидации, при которой консолидированное значение ещё считается определённым (от 0 до 1).
+     * @param                          $reportsOnCell
+     * @param                          $cellCount
+     *
      * @return PmxRrdDatabase
      * @throws \RuntimeException
      */
@@ -250,7 +259,7 @@ class PmxRrdDatabase
 
 //        x-доля определяет долю неопределённых значений в интервале консолидации, при которой консолидированное значение ещё считается определённым (от 0 до 1).
         /**
-        RRA:функция_конс:достоверность:отсчетов_на_ячейку:число_ячеек
+         * RRA:функция_конс:достоверность:отсчетов_на_ячейку:число_ячеек
          */
         /**
          *  RRA:функция-консолидации:x-доля:отсчетов-на-ячейку:число-ячеек
@@ -258,5 +267,19 @@ class PmxRrdDatabase
         $this->rraa[] = "RRA:$type:$reliability:$reportsOnCell:$cellCount";
 
         return $this;
+    }
+
+    /**
+     * @param $path
+     *
+     * @return bool
+     */
+    protected function mkpath($path)
+    {
+        if (@mkdir($path) or file_exists($path)) {
+            return true;
+        }
+
+        return ($this->mkpath(dirname($path)) and mkdir($path));
     }
 }
