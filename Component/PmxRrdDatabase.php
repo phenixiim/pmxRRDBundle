@@ -51,7 +51,7 @@ class PmxRrdDatabase
         if (empty($path)) {
             $ref = new \ReflectionClass('AppKernel');
             $dir = $ref->getFileName();
-            $path = dirname($dir).'/Resources/rrd/';
+            $path = null;
         } else {
             //todo: check if exist path.
         }
