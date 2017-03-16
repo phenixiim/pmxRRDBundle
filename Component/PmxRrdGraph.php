@@ -70,6 +70,9 @@ class PmxRrdGraph
      */
     protected function mkpath($path)
     {
+        if($path === null) {
+            return;
+        }
         if (@mkdir($path) or file_exists($path)) {
             return true;
         }
@@ -170,6 +173,13 @@ class PmxRrdGraph
     public function shift($varName, $offsetTime)
     {
         $this->displayDataRules[] = "SHIFT:$varName:$offsetTime";
+
+        return $this;
+    }
+
+    public function hrule(string $definition, string $label = '')
+    {
+        $this->displayDataRules[] = "HRULE:$definition:$label";
 
         return $this;
     }
@@ -282,7 +292,6 @@ class PmxRrdGraph
      */
     public function addCDef($varName, $reversePolishNotation)
     {
-        //todo: validate $varName
         $this->cdefs[] = "CDEF:$varName=$reversePolishNotation";
 
         return $this;

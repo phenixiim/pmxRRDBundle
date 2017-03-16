@@ -276,6 +276,9 @@ class PmxRrdDatabase
      */
     protected function mkpath($path)
     {
+        if($path === null) {
+            return;
+        }
         if (@mkdir($path) or file_exists($path)) {
             return true;
         }
