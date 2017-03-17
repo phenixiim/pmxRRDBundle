@@ -268,21 +268,4 @@ class PmxRrdDatabase
 
         return $this;
     }
-
-    /**
-     * @param $path
-     *
-     * @return bool
-     */
-    protected function mkpath($path)
-    {
-        if($path === null) {
-            return;
-        }
-        if (@mkdir($path) or file_exists($path)) {
-            return true;
-        }
-
-        return ($this->mkpath(dirname($path)) and mkdir($path));
-    }
 }

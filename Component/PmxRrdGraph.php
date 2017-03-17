@@ -9,7 +9,7 @@ namespace Pmx\Bundle\RrdBundle\Component;
 
 use RuntimeException;
 
-class PmxRrdGraph
+class PmxRrdGraph extends BaseRrdLib
 {
     public $filename;
     public $title = 'pmx graph example';
@@ -61,23 +61,6 @@ class PmxRrdGraph
     public function getImgFilePath(): string
     {
         return $this->imgFileName;
-    }
-
-    /**
-     * @param $path
-     *
-     * @return bool
-     */
-    protected function mkpath($path)
-    {
-        if($path === null) {
-            return;
-        }
-        if (@mkdir($path) or file_exists($path)) {
-            return true;
-        }
-
-        return ($this->mkpath(dirname($path)) and mkdir($path));
     }
 
     public function setTitle($text)
