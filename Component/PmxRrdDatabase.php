@@ -12,7 +12,7 @@ use JMS\AopBundle\Exception\RuntimeException;
 use Pmx\Bundle\RrdBundle\Component\DSType;
 use Pmx\Bundle\RrdBundle\Component\RRAConsolidationFunction;
 
-class PmxRrdDatabase
+class PmxRrdDatabase extends BaseRrdLib
 {
 
     /**
