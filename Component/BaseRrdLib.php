@@ -15,7 +15,7 @@ class BaseRrdLib
             return;
         }
         if (@mkdir($path) or file_exists($path)) {
-            chmod($path, 0666);
+            chmod($path, 0777);
             return true;
         }
 

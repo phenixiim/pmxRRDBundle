@@ -162,6 +162,7 @@ class PmxRrdDatabase extends BaseRrdLib
             $err = rrd_error();
             throw new \Exception("Create error: $err\n");
         }
+        chmod($this->getDatabaseName(), 0666);
 
         return $this;
     }
