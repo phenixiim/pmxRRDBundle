@@ -18,27 +18,8 @@ class PmxRrdGraph extends BaseRrdLib
     public $start = "-14d";
     public $end = "now";
     public $defs = array();
+    public $options = array();
     public $cdefs = array();
-
-    protected $imgFileName;
-
-    protected function setImgFileName($filename)
-    {
-        $filename = $this->getImgFileNameFromFileName($filename);
-
-        if($this->imagePath === null) {
-            throw new \InvalidArgumentException('imagePath should not be null');
-        }
-
-        $this->mkpath($this->imagePath);
-
-        $outputFileName = $this->imagePath.$filename.'.png';
-
-        $this->imgFileName = $outputFileName;
-
-        return $this;
-    }
-
     public $vdefs = array();
     public $displayDataRules = array();
     public $graphWidth = 400;
@@ -46,6 +27,7 @@ class PmxRrdGraph extends BaseRrdLib
     public $onlyGraph = false;
     public $aliases = '';
     public $imagePath;
+    protected $imgFileName;
 
     /**
      * @param $dbLocation
@@ -145,8 +127,6 @@ class PmxRrdGraph extends BaseRrdLib
         return $this;
     }
 
-    //graph display definition functions
-
     /**
      * @param $varName
      * @param $offsetTime
@@ -159,6 +139,8 @@ class PmxRrdGraph extends BaseRrdLib
 
         return $this;
     }
+
+    //graph display definition functions
 
     public function hrule(string $definition, string $label = '')
     {
@@ -263,10 +245,6 @@ class PmxRrdGraph extends BaseRrdLib
         return $this;
     }
 
-    //end graph display definition functions
-
-    // data definition
-
     /**
      * @param string $varName
      * @param string $reversePolishNotation
@@ -280,6 +258,10 @@ class PmxRrdGraph extends BaseRrdLib
         return $this;
     }
 
+    //end graph display definition functions
+
+    // data definition
+
     /**
      * @param string $varName
      * @param string $reversePolishNotation
@@ -290,6 +272,13 @@ class PmxRrdGraph extends BaseRrdLib
     {
         //todo: validate $varName
         $this->vdefs[] = "VDEF:$varName=$reversePolishNotation";
+
+        return $this;
+    }
+
+    public function addOption($option, $value = null)
+    {
+        $this->options[] = '--'.$option.( ($value != null) ? '='.$value : '' );
 
         return $this;
     }
@@ -306,6 +295,8 @@ class PmxRrdGraph extends BaseRrdLib
             "--width=".$this->graphWidth,
             "--height=".$this->graphHeight,
         );
+
+        $opt = array_merge($opt, $this->options);
 
         if ($this->onlyGraph) {
             $opt[] = '--only-graph';
@@ -326,8 +317,6 @@ class PmxRrdGraph extends BaseRrdLib
         return $opt;
     }
 
-    // end data definition
-
     public function doDraw()
     {
 
@@ -340,6 +329,25 @@ class PmxRrdGraph extends BaseRrdLib
         }
     }
 
+    // end data definition
+
+    protected function setImgFileName($filename)
+    {
+        $filename = $this->getImgFileNameFromFileName($filename);
+
+        if ($this->imagePath === null) {
+            throw new \InvalidArgumentException('imagePath should not be null');
+        }
+
+        $this->mkpath($this->imagePath);
+
+        $outputFileName = $this->imagePath.$filename.'.png';
+
+        $this->imgFileName = $outputFileName;
+
+        return $this;
+    }
+
     protected function getDataSourceFromDb($filename)
     {
         $rrdInfo = new PmxRrdInfo($filename);
@@ -350,7 +358,7 @@ class PmxRrdGraph extends BaseRrdLib
     protected function getImgFileNameFromFileName(string $filename): string
     {
         $x = pathinfo($filename);
-        $output = $x['filename'].'_'.rand(1,9999999999);
+        $output = $x['filename'].'_'.rand(1, 9999999999);
 
         return $output;
     }
